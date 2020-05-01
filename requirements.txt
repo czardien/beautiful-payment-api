@@ -1,0 +1,6 @@
+PyYAML
+flask
+flask-swagger-ui
+gunicorn
+marshmallow
+braintree

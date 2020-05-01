@@ -1,0 +1,16 @@
+version: '3.4'
+services:
+  backend:
+    restart: always
+    build:
+      context: .
+      target: Local
+      args:
+        BRAINTREE_MERCHANT_ID: $BRAINTREE_MERCHANT_ID
+        BRAINTREE_PUBLIC_KEY: $BRAINTREE_PUBLIC_KEY
+        BRAINTREE_PRIVATE_KEY: $BRAINTREE_PRIVATE_KEY
+    volumes:
+      - ./src/:/beautiful-payment-api/src
+      - ./lib/:/beautiful-payment-api/lib
+    ports:
+      - "5000:5000"

@@ -1,0 +1,32 @@
+APP_NAME?=beautiful-payment-api
+
+# heroku targets
+heroku-deploy:
+	@echo "Login to Heroku container registry..."
+	@heroku container:login
+	@echo "Build and push docker image..."
+	@heroku container:push web -a $(APP_NAME)
+	@echo "Deploying changes..."
+	@heroku container:release web -a $(APP_NAME)
+	@echo "Done!"
+	@heroku open -a $(APP_NAME)
+
+heroku-config: .guard-BRAINTREE_PUBLIC_KEY .guard-BRAINTREE_PRIVATE_KEY .guard-BRAINTREE_MERCHANT_ID
+	heroku config:set BRAINTREE_MERCHANT_ID=$(BRAINTREE_MERCHANT_ID) -a $(APP_NAME)
+	heroku config:set BRAINTREE_PUBLIC_KEY=$(BRAINTREE_PUBLIC_KEY) -a $(APP_NAME)
+	heroku config:set BRAINTREE_PRIVATE_KEY=$(BRAINTREE_PRIVATE_KEY) -a $(APP_NAME)
+
+heroku-logs:
+	heroku logs --tail -a $(APP_NAME)
+
+# aliases
+deploy: heroku-deploy
+config: heroku-config
+hlogs: heroku-logs
+
+# utils target
+.guard-%:
+	@ if [ "${${*}}" = "" ]; then \
+    echo "Environment variable $* not set"; \
+    exit 1; \
+  fi

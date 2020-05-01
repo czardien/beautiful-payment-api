@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+  description: Provides payment processing backend
+  version: 0.1.0
+  title: Beautiful Payment API
+  contact:
+    email: adrien.czerny+beautiful@gmail.com
+paths:
+
+  # GET - /v1/tokens/
+  /v1/tokens/:
+    get:
+      summary: Returns a client token
+      tags:
+        - tokens
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Client token
+                example:
+                  token: eyJ2ZXJzaW9uIjoyLCJlbnZpcm9ubWVudC
+
+  # POST - /v1/sales/
+  /v1/sales:
+    post:
+      summary: Push a sale to the gateway
+      tags:
+        - sales
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: string
+                  description: "The amount to process"
+                payment_method_nonce:
+                  type: string
+                  description: "The payment method nonce from the gateway"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sale_id:
+                    type: string
+                example:
+                  sale_id: 6ykjke9v
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                # TODO: OneOf: validationError or paymentError
+                errors:
+                  type: object
+                  description: The list of errors per field
+                example:
+                  errors:
+                    - "Unkown or expired payment_method_nonce."
+
+  # GET - /v1/sales/{sale_id}
+  /v1/sales/{sale_id}:
+    get:
+      summary: Retrieves a sale from the gateway
+      tags:
+        - sales
+      parameters:
+        - in: path
+          name: sale_id
+          schema:
+            type: string
+          required: true
+          description: The sale ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sale:
+                    type: object
+                    properties:
+                      amount:
+                        type: string
+                      created_at:
+                        type: string
+                example:
+                  sale:
+                    amount: 100.0
+                    created_at: "2020-04-28T11:02:39"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                errors:
+                  type: object
+                example:
+                  errors:
+                    - "Transaction with id '5khcv7' not found"
+
+  /status:
+    get:
+      summary: Status of the service. Plain text.
+      tags:
+        - service
+      responses:
+        '200':
+          description: OK
+
+  /metrics:
+    get:
+      summary: Metrics to be collected by prometheus.
+      tags:
+        - service
+      responses:
+        '200':
+          description: OK
+
+components:
+  schemas:
+    Sale:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: "The amount to process"
+        payment_method_nonce:
+          type: string
+          description: "The payment method nonce from the gateway"
