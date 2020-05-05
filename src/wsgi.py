@@ -1,4 +1,3 @@
-import logging
 from flask import Flask, redirect, url_for
 
 from lib.config import Config
@@ -9,8 +8,6 @@ from lib.braintree_manager import BraintreeManager
 from lib.routes.v1.tokens import v1tokens
 from lib.routes.v1.sales import v1sales_post, v1sales_get
 
-
-logging.info("Starting application")
 
 application = Flask(Config.APP_NAME)
 application.config.from_object(Config)

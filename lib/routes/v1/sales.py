@@ -13,7 +13,6 @@ def v1sales_get(sale_id: str):
         sale = BraintreeManager.get_gateway().transaction.find(sale_id)
 
     except NotFoundError as err:
-        print(err)
         return jsonify({"errors": str(err)}), HTTPStatus.NOT_FOUND
 
     return jsonify({"sale": {"amount": float(sale.amount), "created_at": sale.created_at.isoformat()}}), HTTPStatus.OK
